@@ -1,0 +1,24 @@
+typedef unsigned int Button;
+
+const Button POWER = 0x45;
+const Button VOL_UP = 0x46;
+const Button STOP = 0x47;
+const Button SEEK_BACK = 0x44;
+const Button PLAY_PAUSE = 0x40;
+const Button SEEK_FORWARD = 0x43;
+const Button DOWN = 0x7; 
+const Button VOL_DOWN = 0x15;
+const Button UP = 0x9;
+const Button EQ = 0x19;
+const Button ST_REPT = 0xD;
+const Button B_0 = 0x16;
+const Button B_1 = 0xC; 
+const Button B_2 = 0x18; 
+const Button B_3 = 0x5E; 
+const Button B_4 = 0x8; 
+const Button B_5 = 0x1C; 
+const Button B_6 = 0x5A; 
+const Button B_7 = 0x42; 
+const Button B_8 = 0x52; 
+const Button B_9 = 0x4A;
+const Button B_REPEAT = 0;

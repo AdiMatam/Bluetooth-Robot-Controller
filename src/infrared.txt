@@ -1,0 +1,75 @@
+#include <Arduino.h>
+#include <IRremote.h>
+#include "Robot.h"
+#include "buttons.h"
+
+const unsigned int PIN = 7;
+IRrecv ir(PIN);
+
+Motor left(12, 4, 3);
+Motor right(9, 8, 10);
+Robot robot(&left, &right);
+Button press = B_REPEAT;
+Button current = B_REPEAT;
+int speed = 255;
+bool lock = false;
+
+void handlePress(Button press);
+
+void setup() {
+    // put your setup code here, to run once: 
+    Serial.begin(9600);
+    ir.begin(PIN, DISABLE_LED_FEEDBACK);
+    robot.drive(true, 255, 2, true);
+}
+
+void loop() {
+    if (ir.decode()) { // Returns 0 if no data ready, 1 if data ready.     
+        press = ir.decodedIRData.command;
+        if (press != B_REPEAT)
+            current = press;
+        handlePress(current);
+        ir.resume(); // Restart the ISR state machine and Receive the next value
+    }
+    else {
+        if (lock)
+            handlePress(current);
+        else {
+            Serial.println("ho!");
+            left.stop(); right.stop();
+        }
+    }
+}
+
+void handlePress(Button press) {
+    switch(press) {
+        case B_2:
+            left.drive(true, speed);
+            right.drive(true, speed);
+            return;
+        case B_8:
+            left.drive(false, speed);
+            right.drive(false, speed);
+            return;
+        case B_6:
+            left.drive(true, speed);
+            right.drive(false, speed);
+            return;
+        case B_4:
+            left.drive(false, speed);
+            right.drive(true, speed);
+            return;
+        case POWER:
+            left.stop(); right.stop();
+            return;
+        case DOWN:
+            speed -= 10;
+            return;
+        case UP:
+            speed += 10;
+            return;
+        // case ST_REPT:
+        //     lock = !lock;
+        //     return;
+    }
+}
