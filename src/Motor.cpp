@@ -30,3 +30,9 @@ void Motor::drive(bool dir, int speed) const {
 void Motor::stop() const {
     drive(0, 0);
 }
+
+void Motor::driveStop(bool dir, int speed, int duration) const {
+    drive(dir, speed);
+    delay(duration);
+    stop();
+}

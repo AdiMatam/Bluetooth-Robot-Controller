@@ -22,6 +22,7 @@ public:
     void swap();
     void drive(bool dir, int speed) const;
     void stop() const;
+    void driveStop(bool dir, int speed, int duration) const;
 };
 
 #endif

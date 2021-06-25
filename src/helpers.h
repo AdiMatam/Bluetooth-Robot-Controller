@@ -1,17 +1,19 @@
 #include <Arduino.h>
 
-void split(String msg, char sep, String* out) {
+// returns # of splits
+int split(String msg, char sep, String* out) {
     int i = 0;
     int space;
     while (true) {
         space = msg.indexOf(" ");
         if (space == -1) {
-            out[i++] = msg;
+            out[i] = msg;
             break;
         }
         out[i++] = msg.substring(0, space);
         msg = msg.substring(space + 1); 
     }
+    return i;
 }
 
 bool contains(const String& str, char value) {
@@ -36,3 +38,15 @@ void printArray(T args[], int len) {
         Serial.print(": " + args[i]);
     }
 }
+
+
+template <typename T>
+bool between(T value, T low, T high) {
+    return (low <= value) && (value <= high);
+}
+
+template <typename T>
+void clamp(T& value, T low, T high) {
+    value = min(high, max(value, low));
+}
+

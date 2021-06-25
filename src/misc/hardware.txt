@@ -1,0 +1,12 @@
+Motor Connection:
+(Arduino) -> (Motor)
+
+LHS:
+3) ENABLE -> Green
+2) Yellow -> ##White
+4) Orange -> ##Black
+
+RHS:
+9)  ENABLE -> Green 
+8)  Red    -> ##Yellow
+10) Brown  -> ##White
