@@ -2,11 +2,12 @@
 #include <SoftwareSerial.h>
 #include <ArduinoBlue.h>
 #include "Robot.h"
-#include "buttons.h"
+#include "Ultrasonic.h"
 #include "helpers.h"
 
 // #define MOTOR_DEBUG
 // #define NO_OP
+// #define WALL_FOLLOW
 
 #if defined(NO_OP)
 void setup() {}
@@ -16,9 +17,9 @@ SoftwareSerial bluetooth(5, 6);
 ArduinoBlue phone(bluetooth);
 Motor left(3, 2, 4);
 Motor right(9, 8, 10);
-// Robot robot(&left, &right);
+Ultrasonic sonic(11, 12);
 
-#if !defined(MOTOR_DEBUG)
+#if !defined(MOTOR_DEBUG) and !defined(WALL_FOLLOW)
 
 void runBot(int steering, int throttle) {
     // delay(1000);
@@ -55,60 +56,47 @@ void runBot(int steering, int throttle) {
 
 void runMain() {
 #if defined(MOTOR_DEBUG)
-    Motor* motors[2] = {&left, &right};
-    for (int dir = 0; dir < 2; dir++) {
-        for (int index = 0; index < 2; index++)
-            motors[index]->driveStop(bool(dir), speed, 2000);
-    }
-#else
-    // speed window = 150->255
-    // steering domain => 0->99
-    // throttle domain => 0, 49, 99
-    // slider => 0->200
-    bool power = false;
-    bool forward = true;
-    int steering = 0; 
-    
     while (true) {
-        int button = phone.getButton();
-        if (phone.getSliderId() == 0) {
-            steering = phone.getSliderVal() - 100;
-            // Serial.println(steering);
+        int distance = side.getDistanceCentimeter();
+        Serial.println(distance);
+        delay(1000);
+    }
+#elif defined(WALL_FOLLOW)
+    const int goalDistance = 25;
+    int currDistance;
+    const int normalSpeed = 200;
+    int speedDelta;
+    bool connected = false;
+
+    while (true) {
+        // delay(200);
+        int but = phone.getButton();
+        if (but == 1) {
+            phone.sendText("Toggle connection");
+            connected = !connected;
         }
-        if (button == 1)
-            power ^= 1;
-        else if (button == 2)
-            forward ^= 1;
-
-        int throttle = 49 - phone.getThrottle();
-        clamp(throttle, -45, 45);
-        if (abs(throttle) >= 25) {
-            const int constantSpeed = 255;
-            forward = throttle < 0;
-            steering = 49 - phone.getSteering();
-            clamp(steering, -45, 45);
-
-            if (steering == 0) {
-                left.drive(forward, constantSpeed);
-                right.drive(forward, constantSpeed);
-            }
-            else {
-                int variableSpeed = map(abs(steering), 45, 0, 0, constantSpeed);
-                if (steering > 0) {
-                    left.drive(forward, variableSpeed);
-                    right.drive(forward, constantSpeed);
-                }
-                else {
-                    left.drive(forward, constantSpeed);
-                    right.drive(forward, variableSpeed);
-                }
-            }
+        currDistance = sonic.getDistanceCentimeter();
+        if (but == 2)
+            phone.sendText(String(currDistance));
+        if (currDistance > 500) 
+            continue;
+        if (connected) {
+            speedDelta = abs(goalDistance - currDistance) * 2; // generate positive #
+            if (currDistance >= goalDistance + 2)
+                speedDelta *= -1;
+            left.drive(true,  
+                clampReturn(normalSpeed + speedDelta, normalSpeed - 30, normalSpeed + 30)
+            );
+            right.drive(true, 
+                clampReturn(normalSpeed - speedDelta, normalSpeed - 30, normalSpeed + 30)
+            );
         }
         else {
-            left.stop();
-            right.stop();
+            left.stop(); right.stop();
         }
-    }
+    }   
+#else
+    runBot(phone.getSteering(), phone.getThrottle());
 #endif
 }
 void setup() {

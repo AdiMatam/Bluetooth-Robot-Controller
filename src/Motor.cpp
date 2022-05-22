@@ -1,4 +1,6 @@
 #include "Motor.h"
+#include "helpers.h"
+
 
 Motor::Motor(Pin enable, Pin pin1, Pin pin2) 
     : m_Enable(enable), m_Pin1(pin1), m_Pin2(pin2) {
@@ -22,6 +24,7 @@ void Motor::swap() {
 }
 
 void Motor::drive(bool dir, int speed) const {
+    clamp(speed, 0, 255);
     analogWrite(m_Enable, speed);
     digitalWrite(m_Pin1, dir);
     digitalWrite(m_Pin2, dir ^ 1);

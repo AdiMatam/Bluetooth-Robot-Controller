@@ -10,3 +10,7 @@ RHS:
 9)  ENABLE -> Green 
 8)  Red    -> ##Yellow
 10) Brown  -> ##White
+
+Left-US:
+11) Echo <-> White
+12) Trig <-> Gray

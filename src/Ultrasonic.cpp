@@ -8,11 +8,12 @@ Ultrasonic::Ultrasonic(int trig, int echo)
 }
 
 int Ultrasonic::getDistanceCentimeter() {
-    digitalWrite(m_Trig, 1);
+    digitalWrite(m_Trig, LOW);
+    delayMicroseconds(2);
+    digitalWrite(m_Trig, HIGH);
     delayMicroseconds(10);
-    digitalWrite(m_Trig, 0);
+    digitalWrite(m_Trig, LOW);
 
-    float duration = pulseIn(m_Echo, 1);
+    float duration = pulseIn(m_Echo, HIGH);
     return int(duration * 0.034f / 2.f); // cm distance
 }
-
